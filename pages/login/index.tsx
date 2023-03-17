@@ -1,10 +1,7 @@
-"use client";
-
 import { FormEvent, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-// import { Button, Checkbox, Input, Label } from '@/components/ui';
-import { Button, Checkbox, Input, Label } from "../components/ui";
+import { Button, Checkbox, Input, Label } from "../../components/ui";
 
 export default function LoginPage() {
   const { push } = useRouter();
@@ -31,7 +28,7 @@ export default function LoginPage() {
       push("/");
     } catch (error) {
       setError("Something went wrong!");
-      console.log(error);
+      console.log({ error });
     }
   }
 
@@ -53,7 +50,7 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <Input
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
-                type="email"
+                // type="email"
                 name="email"
                 id="email"
                 placeholder="Enter your email"

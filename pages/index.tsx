@@ -1,5 +1,4 @@
-import { Button, Checkbox, Input, Label } from "./components/ui";
-import styles from "./page.module.css";
+import { Button, Checkbox, Input, Label } from "../components/ui";
 
 export default function Home() {
   return (
