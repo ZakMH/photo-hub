@@ -37,3 +37,6 @@ next-env.d.ts
 
 # database
 /photo-hub-db
+
+# env
+/.env
