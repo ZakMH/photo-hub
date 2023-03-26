@@ -2,9 +2,21 @@ import { FormEvent, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Checkbox, Input, Label } from "../../components/ui";
+import { signIn, useSession } from "next-auth/react";
+
+// export async function getServerSideProps(context: any) {
+//   return {
+//     props: {
+//       csrfToken: await getCsrfToken(context),
+//     },
+//   };
+// }
 
 export default function LoginPage() {
   const { push } = useRouter();
+  // TODO: protect route on server side
+  const { status } = useSession();
+  if (status === "authenticated") push("/");
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     email: "",
@@ -24,8 +36,15 @@ export default function LoginPage() {
       if (!form.email || !form.password) {
         return setError("Make sure to enter a valid email and password!");
       }
-      console.log(form);
-      push("/");
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: form.email,
+        password: form.password,
+        callbackUrl: `${window.location.origin}`,
+      });
+      if (res?.error) setError(res.error);
+
+      if (res?.url) push("/");
     } catch (error) {
       setError("Something went wrong!");
       console.log({ error });

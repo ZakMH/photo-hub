@@ -43,3 +43,5 @@ export default function Home() {
     </main>
   );
 }
+
+Home.auth = true;
