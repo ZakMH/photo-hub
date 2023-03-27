@@ -3,23 +3,26 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Checkbox, Input, Label } from "../../components/ui";
 import { signIn, useSession } from "next-auth/react";
+import { GetServerSideProps } from "next";
 
-// export async function getServerSideProps(context: any) {
-//   return {
-//     props: {
-//       csrfToken: await getCsrfToken(context),
-//     },
-//   };
-// }
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const { cookies } = req;
+  if (cookies["next-auth.session-token"]) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+  return { props: {} };
+};
 
 export default function LoginPage() {
   const { push } = useRouter();
-  // TODO: protect route on server side
-  const { status } = useSession();
-  if (status === "authenticated") push("/");
   const [error, setError] = useState("");
   const [form, setForm] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
@@ -33,12 +36,12 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault();
-      if (!form.email || !form.password) {
-        return setError("Make sure to enter a valid email and password!");
+      if (!form.username || !form.password) {
+        return setError("Make sure to enter a valid username and password!");
       }
       const res = await signIn("credentials", {
         redirect: false,
-        email: form.email,
+        username: form.username,
         password: form.password,
         callbackUrl: `${window.location.origin}`,
       });
@@ -66,13 +69,12 @@ export default function LoginPage() {
               </div>
             )}
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
                 onChange={(e) => handleChange(e.target.name, e.target.value)}
-                // type="email"
-                name="email"
-                id="email"
-                placeholder="Enter your email"
+                name="username"
+                id="username"
+                placeholder="Enter your username"
               />
             </div>
             <div className="grid w-full items-center gap-1.5">

@@ -1,17 +1,16 @@
-// import { DefaultSession } from "next-auth";
+import { DefaultSession } from "next-auth";
 
-// declare module "next-auth" {
-//   interface User {
-//     token: string;
-//     refreshToken: string;
-//     accessToken: string;
-//     accessTokenExpires: string;
-//   }
+declare module "next-auth" {
+  interface User {
+    username: string;
+    likedImages: string[];
+    isBlocked: boolean;
+  }
 
-//   interface Session extends DefaultSession {
-//     user?: User;
-//   }
-// }
+  interface Session extends DefaultSession {
+    user?: User;
+  }
+}
 
 // declare module "next-auth/jwt" {
 //   interface JWT {
@@ -20,4 +19,3 @@
 //     accessTokenExpires: string;
 //   }
 // }
-

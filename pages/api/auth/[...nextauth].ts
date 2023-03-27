@@ -1,8 +1,9 @@
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { User } from "@/types";
 import users from "@/data";
 import { Level } from "level";
+// import { JWT } from "next-auth/jwt";
 
 const db = new Level("./photo-hub-db");
 // let executed = false;
@@ -20,44 +21,37 @@ async function createUser(db: Level<string, string>, user: User) {
   }
 })(db);
 
-export const authOptions = {
+export default NextAuth({
   providers: [
     CredentialsProvider({
       name: "photo-hub",
       credentials: {
-        // TODO: switch email to username
-        email: {
-          label: "email",
-          type: "email",
+        username: {
+          label: "Username",
+          type: "text",
         },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
         const payload = {
-          email: credentials?.email,
+          username: credentials?.username,
           password: credentials?.password,
         };
         let user = null;
 
-        if (payload?.email) {
+        if (payload?.username) {
           await db.open();
-          const res = await db.get(payload?.email);
+          const res = await db.get(payload?.username);
           user = JSON.parse(res);
           await db.close();
         }
 
-        console.log({ user });
+        if (user.password !== payload.password) throw new Error("Bad credentials");
 
-        if (user.password !== payload.password) {
-          throw new Error("Bad credentials");
-        }
-
-        if (user.isBlocked) throw new Error("User is Blocked");
+        if (user.isBlocked) throw new Error("user is Blocked");
 
         // If no error and we have user data, return it
-        if (user) {
-          return user;
-        }
+        if (user) return user;
 
         // Return null if user data could not be retrieved
         return null;
@@ -68,33 +62,20 @@ export const authOptions = {
   pages: {
     signIn: "/login",
   },
-  // callbacks: {
-  //   async jwt({ token, user }) {
-  //     // if ( user) {
-  //     //   // token.user = user
-  //     //   return {
-  //     //     ...token,
-  //     //     // accessToken: user.token,
-  //     //     // refreshToken: user.refreshToken,
-  //     //   };
-  //     // }
-
-  //     return { ...token, ...user };
-  //   },
-
-  //   async session({ session, user, token }) {
-  //     // if (session?.user) {
-  //     //   // session.user = token.user;
-  //     //   // session.user.accessToken = token.accessToken;
-  //     //   // session.user.refreshToken = token.refreshToken;
-  //     //   // session.user.accessTokenExpires = token.accessTokenExpires;
-  //     // }
-
-  //     return token;
-  //   },
-  // },
+  callbacks: {
+    async session({ session, token }) {
+      // @ts-ignore
+      const { password, ...rest } = token.user;
+      session.user = rest;
+      return Promise.resolve(session);
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return Promise.resolve(token);
+    },
+  },
   // Enable debug messages in the console if you are having problems
   debug: process.env.NODE_ENV === "development",
-};
-
-export default NextAuth(authOptions);
+});

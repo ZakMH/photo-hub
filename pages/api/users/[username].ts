@@ -1,25 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-// import type { User } from "@/types";
-// import users from "@/data";
 import { Level } from "level";
-// let executed = false;
-
-// // TODO: refactor into layers
-
-// async function createUser(db: Level<string, string>, user: User) {
-//   return await db.put(user.username, JSON.stringify(user));
-// }
 
 const db = new Level("./photo-hub-db");
-
-// ((db: Level<string, string>) => {
-//   if (true) {
-//     users.forEach(async (user) => await createUser(db, user));
-//     console.log("Function executed !!");
-//     executed = true;
-//   }
-// })(db);
 
 type Data = any;
 

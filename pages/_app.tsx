@@ -49,5 +49,5 @@ function Auth({ children }: AuthProps): JSX.Element {
 
   // Session is being fetched, or no user.
   // If no user, useEffect() will redirect.
-  return <div>Loading...</div>;
+  return <></>;
 }

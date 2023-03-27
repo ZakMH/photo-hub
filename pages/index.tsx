@@ -1,14 +1,12 @@
 import { Card } from "@/components/card";
 import { Header } from "@/components/header";
 import { accessToken, baseURL } from "@/config/constants";
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useInfiniteQuery } from "react-query";
 
 type Photo = {
   id: string;
   likes: number;
-  liked_by_user: boolean;
   user: {
     name: string;
   };
@@ -28,7 +26,6 @@ const fetchPhotos = async (page: number) => {
 };
 
 export default function Home() {
-  console.log(useSession().data?.user);
   const { data, hasNextPage, fetchNextPage } = useInfiniteQuery(
     "photos",
     ({ pageParam = 1 }) => fetchPhotos(pageParam),
@@ -70,14 +67,13 @@ export default function Home() {
             ({
               id,
               likes,
-              liked_by_user,
               user: { name },
               urls: { regular },
             }: Photo) => (
               <Card
                 key={id}
+                id={id}
                 imageUrl={regular}
-                isLiked={liked_by_user}
                 likes={likes}
                 username={name}
               />
