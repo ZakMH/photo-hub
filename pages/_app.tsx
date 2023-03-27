@@ -1,8 +1,9 @@
 import "@/styles/globals.css";
 import { NextComponentType } from "next";
 import { SessionProvider, signIn, useSession } from "next-auth/react";
-import type { AppProps } from "next/app";
 import React, { ReactElement, useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
+import type { AppProps } from "next/app";
 
 type CustomAppProps = AppProps & {
   Component: NextComponentType & { auth?: boolean };
@@ -12,19 +13,23 @@ type AuthProps = {
   children: ReactElement;
 };
 
+const client = new QueryClient({});
+
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
 }: CustomAppProps) {
   return (
     <SessionProvider session={session}>
-      {Component.auth ? (
-        <Auth>
+      <QueryClientProvider client={client}>
+        {Component.auth ? (
+          <Auth>
+            <Component {...pageProps} />
+          </Auth>
+        ) : (
           <Component {...pageProps} />
-        </Auth>
-      ) : (
-        <Component {...pageProps} />
-      )}
+        )}
+      </QueryClientProvider>
     </SessionProvider>
   );
 }
